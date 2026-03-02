@@ -120,26 +120,34 @@ export default function DiaryEditorPage() {
           <ArrowLeft size={16} />
           返回日记列表
         </button>
-        <div className="flex items-center gap-2 text-xs text-ink-muted">
-          {saveStatus === 'saving' && (
-            <>
-              <Loader2 size={12} className="animate-spin" />
-              <span>保存中...</span>
-            </>
-          )}
-          {saveStatus === 'saved' && (
-            <>
-              <Check size={12} className="text-sage" />
-              <span className="text-sage">已保存</span>
-            </>
-          )}
-          {saveStatus === 'error' && (
-            <>
-              <AlertCircle size={12} className="text-terracotta" />
-              <span className="text-terracotta">保存失败</span>
-            </>
-          )}
-          <span className="ml-2">{wordCount} 字</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-ink-muted">
+            {saveStatus === 'saving' && (
+              <>
+                <Loader2 size={12} className="animate-spin" />
+                <span>保存中...</span>
+              </>
+            )}
+            {saveStatus === 'saved' && (
+              <>
+                <Check size={12} className="text-sage" />
+                <span className="text-sage">已保存</span>
+              </>
+            )}
+            {saveStatus === 'error' && (
+              <>
+                <AlertCircle size={12} className="text-terracotta" />
+                <span className="text-terracotta">保存失败</span>
+              </>
+            )}
+            <span className="ml-1">{wordCount} 字</span>
+          </div>
+          <button
+            onClick={() => saveFn(form)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-button text-[13px] font-medium bg-ink text-cream hover:bg-[#2A2520] hover:-translate-y-px transition-all"
+          >
+            💾 保存
+          </button>
         </div>
       </div>
 
