@@ -26,6 +26,8 @@ export default function DiaryEditorPage() {
   const isNew = params.id === 'new'
   const [diaryId, setDiaryId] = useState<string | null>(isNew ? null : params.id as string)
   const [loading, setLoading] = useState(!isNew)
+  const [manualSaving, setManualSaving] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [form, setForm] = useState<DiaryFormData>({
     title: '',
     body: '',
@@ -37,7 +39,24 @@ export default function DiaryEditorPage() {
   })
   const initializedRef = useRef(false)
   const savingRef = useRef(false)
+  const diaryIdRef = useRef<string | null>(isNew ? null : params.id as string)
 
+  // Keep diaryIdRef in sync
+  useEffect(() => {
+    diaryIdRef.current = diaryId
+  }, [diaryId])
+
+  // Check auth on mount
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.replace('/login')
+      }
+    })
+  }, [router])
+
+  // Load existing diary
   useEffect(() => {
     if (isNew || initializedRef.current) return
     initializedRef.current = true
@@ -47,7 +66,8 @@ export default function DiaryEditorPage() {
       .select('*')
       .eq('id', params.id)
       .single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('Load diary error:', error)
         if (data) {
           setForm({
             title: data.title || '',
@@ -63,15 +83,20 @@ export default function DiaryEditorPage() {
       })
   }, [isNew, params.id])
 
+  // Use ref for diaryId so saveFn stays stable and never gets stale
   const saveFn = useCallback(async (data: DiaryFormData) => {
     if (savingRef.current) return
     savingRef.current = true
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        throw new Error('未登录，请先登录')
+      }
 
-      if (!diaryId) {
+      const currentDiaryId = diaryIdRef.current
+
+      if (!currentDiaryId) {
         const { data: newDiary, error } = await supabase
           .from('diaries')
           .insert({
@@ -81,25 +106,50 @@ export default function DiaryEditorPage() {
           })
           .select('id')
           .single()
-        if (newDiary && !error) {
+        if (error) {
+          console.error('Insert diary error:', error)
+          throw new Error('保存失败: ' + error.message)
+        }
+        if (newDiary) {
           setDiaryId(newDiary.id)
+          diaryIdRef.current = newDiary.id
           window.history.replaceState(null, '', `/diary/${newDiary.id}`)
         }
       } else {
-        await supabase
+        const { error } = await supabase
           .from('diaries')
           .update({
             ...data,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', diaryId)
+          .eq('id', currentDiaryId)
+        if (error) {
+          console.error('Update diary error:', error)
+          throw new Error('更新失败: ' + error.message)
+        }
       }
+      setErrorMsg(null)
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : '保存失败')
+      throw e // Re-throw so auto-save hook shows 'error' status
     } finally {
       savingRef.current = false
     }
-  }, [diaryId])
+  }, []) // No dependencies — uses diaryIdRef for latest value
 
   const saveStatus = useAutoSave(form, saveFn)
+
+  const handleManualSave = async () => {
+    setManualSaving(true)
+    setErrorMsg(null)
+    try {
+      await saveFn(form)
+    } catch {
+      // Error already set in saveFn
+    } finally {
+      setManualSaving(false)
+    }
+  }
 
   const wordCount = form.body.length
 
@@ -129,19 +179,19 @@ export default function DiaryEditorPage() {
         </button>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs text-ink-muted">
-            {saveStatus === 'saving' && (
+            {(saveStatus === 'saving' || manualSaving) && (
               <>
                 <Loader2 size={12} className="animate-spin" />
                 <span>保存中...</span>
               </>
             )}
-            {saveStatus === 'saved' && (
+            {saveStatus === 'saved' && !manualSaving && (
               <>
                 <Check size={12} className="text-sage" />
                 <span className="text-sage">已保存</span>
               </>
             )}
-            {saveStatus === 'error' && (
+            {saveStatus === 'error' && !manualSaving && (
               <>
                 <AlertCircle size={12} className="text-terracotta" />
                 <span className="text-terracotta">保存失败</span>
@@ -150,13 +200,22 @@ export default function DiaryEditorPage() {
             <span className="ml-1">{wordCount} 字</span>
           </div>
           <button
-            onClick={() => saveFn(form)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-button text-[13px] font-medium bg-ink text-cream hover:bg-[#2A2520] hover:-translate-y-px transition-all"
+            onClick={handleManualSave}
+            disabled={manualSaving}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-button text-[13px] font-medium bg-ink text-cream hover:bg-[#2A2520] hover:-translate-y-px transition-all disabled:opacity-50"
           >
-            💾 保存
+            {manualSaving ? '保存中...' : '💾 保存'}
           </button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {errorMsg && (
+        <div className="mb-4 p-3 rounded-input bg-terracotta/10 border border-terracotta/20 text-sm text-terracotta flex items-center gap-2">
+          <AlertCircle size={14} />
+          {errorMsg}
+        </div>
+      )}
 
       {/* Mood Selector */}
       <div className="mb-6">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useAuthGuard } from '@/hooks/use-auth-guard'
 import { getGreeting, getDaysRemaining, formatDate } from '@/lib/utils'
 import { SectionHeader } from '@/components/shared/section-header'
 import { ContentCard } from '@/components/shared/content-card'
@@ -15,6 +16,7 @@ import type { Content, Video, Parenting, Career, Finance } from '@/lib/types'
 
 export default function DashboardPage() {
   const router = useRouter()
+  const authReady = useAuthGuard()
   const [contents, setContents] = useState<Content[]>([])
   const [videos, setVideos] = useState<Video[]>([])
   const [parentingItems, setParentingItems] = useState<Parenting[]>([])
@@ -28,6 +30,7 @@ export default function DashboardPage() {
   const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`
 
   useEffect(() => {
+    if (!authReady) return
     const supabase = createClient()
     supabase.from('contents').select('*').order('created_at', { ascending: false }).limit(3).then(({ data }) => setContents(data || []))
     supabase.from('videos').select('*').order('created_at', { ascending: false }).limit(5).then(({ data }) => setVideos(data || []))
@@ -35,7 +38,7 @@ export default function DashboardPage() {
     supabase.from('career').select('*').order('created_at', { ascending: false }).limit(3).then(({ data }) => setCareerItems(data || []))
     supabase.from('finance').select('*').order('created_at', { ascending: false }).limit(4).then(({ data }) => setFinanceItems(data || []))
     supabase.from('diaries').select('id', { count: 'exact', head: true }).then(({ count }) => setDiaryCount(count || 0))
-  }, [])
+  }, [authReady])
 
   return (
     <WithShell>

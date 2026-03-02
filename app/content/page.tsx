@@ -30,6 +30,7 @@ function ContentPage() {
   const [filter, setFilter] = useState('全部')
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(showNew)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   // Modal state
   const [url, setUrl] = useState('')
@@ -87,10 +88,15 @@ function ContentPage() {
   const handleSave = async () => {
     if (!preview) return
     setSaving(true)
+    setSaveError(null)
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setSaving(false); return }
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        setSaveError('未登录，请先登录后再试')
+        console.error('Auth error:', authError)
+        return
+      }
 
       let sourceType = 'web'
       if (url.includes('weixin') || url.includes('mp.weixin') || url.includes('wechat')) sourceType = 'wechat'
@@ -106,16 +112,22 @@ function ContentPage() {
         source_type: sourceType,
       })
 
-      if (error) { console.error('Save error:', error); setSaving(false); return }
+      if (error) {
+        console.error('Save content error:', error)
+        setSaveError('保存失败: ' + error.message)
+        return
+      }
 
       setShowModal(false)
       setUrl('')
       setPreview(null)
       setMyNote('')
       setSelectedCategory('')
+      setSaveError(null)
       loadContents()
     } catch (e) {
       console.error('Save error:', e)
+      setSaveError('保存异常，请重试')
     } finally {
       setSaving(false)
     }
@@ -283,6 +295,13 @@ function ContentPage() {
                     className="w-full min-h-[80px] px-3.5 py-3 border-[1.5px] border-border rounded-input text-sm text-ink bg-warm-white outline-none transition-colors focus:border-gold resize-none leading-relaxed"
                   />
                 </div>
+
+                {/* Error Message */}
+                {saveError && (
+                  <div className="mb-4 p-3 rounded-input bg-terracotta/10 border border-terracotta/20 text-sm text-terracotta">
+                    {saveError}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-2.5 justify-end mt-7">
