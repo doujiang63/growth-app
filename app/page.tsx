@@ -12,7 +12,8 @@ import { ModuleCard } from '@/components/shared/module-card'
 import { MilestoneItem } from '@/components/shared/milestone-item'
 import { ProgressBar } from '@/components/shared/progress-bar'
 import { WithShell } from '@/components/layout/with-shell'
-import type { Content, Video, Parenting, Career, Finance } from '@/lib/types'
+import { HabitChecklist } from '@/components/shared/habit-checklist'
+import type { Content, Video, Parenting, Career, Finance, Inspiration } from '@/lib/types'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -23,6 +24,9 @@ export default function DashboardPage() {
   const [careerItems, setCareerItems] = useState<Career[]>([])
   const [financeItems, setFinanceItems] = useState<Finance[]>([])
   const [diaryCount, setDiaryCount] = useState(0)
+  const [inspirations, setInspirations] = useState<Inspiration[]>([])
+  const [energy, setEnergy] = useState(0)
+  const [peakTime, setPeakTime] = useState<string | null>(null)
 
   const now = new Date()
   const greeting = getGreeting()
@@ -38,6 +42,11 @@ export default function DashboardPage() {
     supabase.from('career').select('*').order('created_at', { ascending: false }).limit(3).then(({ data }) => setCareerItems(data || []))
     supabase.from('finance').select('*').order('created_at', { ascending: false }).limit(4).then(({ data }) => setFinanceItems(data || []))
     supabase.from('diaries').select('id', { count: 'exact', head: true }).then(({ count }) => setDiaryCount(count || 0))
+    supabase.from('inspirations').select('*').order('created_at', { ascending: false }).limit(3).then(({ data }) => setInspirations(data || []))
+    fetch('/api/energy').then(r => r.json()).then(data => {
+      if (data.level) setEnergy(data.level)
+      if (data.peak_time) setPeakTime(data.peak_time)
+    }).catch(() => {})
   }, [authReady])
 
   return (
@@ -71,6 +80,35 @@ export default function DashboardPage() {
               📎 存内容
             </button>
           </div>
+        </div>
+
+        {/* Energy & Peak Time Display */}
+        {(energy > 0 || peakTime) && (
+          <div className="flex items-center gap-4 mb-4 relative z-10">
+            {energy > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-white/30 tracking-wider">能量</span>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map(l => (
+                    <div key={l} className={`w-2 h-2 rounded-full ${energy >= l ? 'bg-gold' : 'bg-white/15'}`} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {peakTime && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-white/30 tracking-wider">高效时段</span>
+                <span className="text-[11px] text-sage px-2 py-0.5 rounded bg-sage/15">
+                  {peakTime === 'morning' ? '上午' : peakTime === 'afternoon' ? '下午' : '晚上'}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Habit Checklist */}
+        <div className="mb-4 relative z-10">
+          <HabitChecklist compact />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 relative z-10">
@@ -107,6 +145,7 @@ export default function DashboardPage() {
               category={c.category || '其他'}
               sourceType={(c.source_type as 'wechat' | 'youtube' | 'web') || 'web'}
               sourceName=""
+              keyPoints={c.key_points || []}
               date={formatDate(c.created_at)}
               aiSummary={!!c.summary}
               onClick={() => {}}
@@ -118,6 +157,30 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Latest Inspirations */}
+      {inspirations.length > 0 && (
+        <>
+          <SectionHeader title="最新灵感" actionLabel="查看全部 →" onAction={() => router.push('/inspiration')} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+            {inspirations.map(item => (
+              <div
+                key={item.id}
+                onClick={() => router.push('/inspiration')}
+                className="border border-border rounded-card bg-white p-3.5 cursor-pointer hover:shadow-card hover:-translate-y-0.5 transition-all"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-base">{{ '新词概念': '📖', '新工具': '🔧', '创意想法': '✨', '待深挖话题': '🔍', '其他': '📌' }[item.type]}</span>
+                  <h4 className="text-[13px] font-medium text-ink truncate">{item.title}</h4>
+                </div>
+                {item.description && (
+                  <p className="text-[11px] text-ink-muted leading-relaxed line-clamp-2">{item.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Video Timeline */}
       <SectionHeader title="视频日记" actionLabel="查看全部 →" onAction={() => router.push('/video')} />

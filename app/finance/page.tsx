@@ -98,6 +98,14 @@ export default function FinancePage() {
     }
   }
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (!confirm('确定要删除这个理财目标吗？')) return
+    const supabase = createClient()
+    await supabase.from('finance').delete().eq('id', id)
+    setGoals(prev => prev.filter(g => g.id !== id))
+  }
+
   const totalTarget = goals.reduce((sum, g) => sum + (g.target_amount || 0), 0)
   const totalCurrent = goals.reduce((sum, g) => sum + (g.current_amount || 0), 0)
   const overallProgress = totalTarget > 0 ? Math.round((totalCurrent / totalTarget) * 100) : 0
@@ -251,8 +259,14 @@ export default function FinancePage() {
                     </div>
                   )}
 
-                  {/* Date */}
-                  <div className="flex justify-end mt-2">
+                  {/* Date & Delete */}
+                  <div className="flex items-center justify-between mt-2">
+                    <button
+                      onClick={(e) => handleDelete(e, goal.id)}
+                      className="text-[11px] text-ink-muted hover:text-terracotta transition-colors"
+                    >
+                      删除
+                    </button>
                     <span className="text-[11px] text-ink-muted">{formatDate(goal.created_at)}</span>
                   </div>
                 </div>

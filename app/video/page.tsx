@@ -40,6 +40,14 @@ export default function VideoPage() {
       })
   }, [])
 
+  const handleDeleteVideo = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (!confirm('确定要删除这个视频吗？')) return
+    const supabase = createClient()
+    await supabase.from('videos').delete().eq('id', id)
+    setVideos(prev => prev.filter(v => v.id !== id))
+  }
+
   const handleSaveDouyin = async () => {
     if (!douyinUrl.trim()) return
     setSavingDouyin(true)
@@ -155,20 +163,27 @@ export default function VideoPage() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {videos.map((v, i) => (
-            <VideoCard
-              key={v.id}
-              title={v.title || ''}
-              date={formatDate(v.created_at)}
-              emoji={EMOJIS[i % EMOJIS.length]}
-              gradient={GRADIENTS[i % GRADIENTS.length]}
-              onClick={() => {
-                if (v.douyin_url) {
-                  window.open(v.douyin_url, '_blank')
-                } else if (v.video_url) {
-                  window.open(v.video_url, '_blank')
-                }
-              }}
-            />
+            <div key={v.id} className="relative group">
+              <VideoCard
+                title={v.title || ''}
+                date={formatDate(v.created_at)}
+                emoji={EMOJIS[i % EMOJIS.length]}
+                gradient={GRADIENTS[i % GRADIENTS.length]}
+                onClick={() => {
+                  if (v.douyin_url) {
+                    window.open(v.douyin_url, '_blank')
+                  } else if (v.video_url) {
+                    window.open(v.video_url, '_blank')
+                  }
+                }}
+              />
+              <button
+                onClick={(e) => handleDeleteVideo(e, v.id)}
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[11px] text-ink-muted hover:text-terracotta bg-white/80 backdrop-blur-sm px-2 py-1 rounded transition-all"
+              >
+                删除
+              </button>
+            </div>
           ))}
 
           {/* Add new card */}

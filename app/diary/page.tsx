@@ -14,7 +14,7 @@ export default function DiaryListPage() {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const loadData = () => {
     const supabase = createClient()
     supabase
       .from('diaries')
@@ -24,7 +24,19 @@ export default function DiaryListPage() {
         setDiaries(data || [])
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadData()
   }, [])
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (!confirm('确定要删除这篇日记吗？')) return
+    const supabase = createClient()
+    await supabase.from('diaries').delete().eq('id', id)
+    setDiaries(prev => prev.filter(d => d.id !== id))
+  }
 
   const getMoodEmoji = (mood: string) => MOODS.find(m => m.value === mood)?.emoji || '📝'
 
@@ -74,7 +86,15 @@ export default function DiaryListPage() {
                     {formatFullDate(diary.created_at)}
                   </span>
                 </div>
-                {diary.mood && <TagBadge value={diary.mood} />}
+                <div className="flex items-center gap-2">
+                  {diary.mood && <TagBadge value={diary.mood} />}
+                  <button
+                    onClick={(e) => handleDelete(e, diary.id)}
+                    className="text-[11px] text-ink-muted hover:text-terracotta transition-colors px-1.5 py-0.5"
+                  >
+                    删除
+                  </button>
+                </div>
               </div>
               <div className="px-5 py-4">
                 {diary.title && (

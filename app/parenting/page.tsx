@@ -94,6 +94,14 @@ export default function ParentingPage() {
     }
   }
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (!confirm('确定要删除这条记录吗？')) return
+    const supabase = createClient()
+    await supabase.from('parenting').delete().eq('id', id)
+    setMilestones(prev => prev.filter(m => m.id !== id))
+  }
+
   const toggleTag = (tag: string) => {
     setFormTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
@@ -198,7 +206,13 @@ export default function ParentingPage() {
                         {tags.map(tag => (
                           <TagBadge key={tag} value={tag} />
                         ))}
-                        <span className="text-[11px] text-ink-muted ml-auto">
+                        <button
+                          onClick={(e) => handleDelete(e, m.id)}
+                          className="text-[11px] text-ink-muted hover:text-terracotta transition-colors ml-auto"
+                        >
+                          删除
+                        </button>
+                        <span className="text-[11px] text-ink-muted">
                           {formatDate(m.created_at)}
                         </span>
                       </div>

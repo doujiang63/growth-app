@@ -92,6 +92,14 @@ export default function CareerPage() {
     }
   }
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    if (!confirm('确定要删除这条记录吗？')) return
+    const supabase = createClient()
+    await supabase.from('career').delete().eq('id', id)
+    setItems(prev => prev.filter(i => i.id !== id))
+  }
+
   const goalCount = items.filter(i => i.type === 'goal').length
   const decisionCount = items.filter(i => i.type === 'decision').length
   const learningCount = items.filter(i => i.type === 'learning').length
@@ -213,7 +221,13 @@ export default function CareerPage() {
                         <span className="text-[11px] text-ink-muted">{item.progress}%</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-end mt-2">
+                    <div className="flex items-center justify-between mt-2">
+                      <button
+                        onClick={(e) => handleDelete(e, item.id)}
+                        className="text-[11px] text-ink-muted hover:text-terracotta transition-colors"
+                      >
+                        删除
+                      </button>
                       <span className="text-[11px] text-ink-muted">
                         {formatDate(item.created_at)}
                       </span>

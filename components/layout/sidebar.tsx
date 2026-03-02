@@ -15,6 +15,7 @@ interface SidebarProps {
 export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
   const [energy, setEnergy] = useState(0)
+  const [peakTime, setPeakTime] = useState<string | null>(null)
   const now = new Date()
   const day = String(now.getDate()).padStart(2, '0')
   const weekdays = ['日', '一', '二', '三', '四', '五', '六']
@@ -27,12 +28,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       const today = new Date().toISOString().split('T')[0]
       const { data } = await supabase
         .from('energy_logs')
-        .select('level')
+        .select('level, peak_time')
         .eq('user_id', user.id)
         .gte('created_at', today)
         .lte('created_at', today + 'T23:59:59')
         .single()
-      if (data) setEnergy(data.level)
+      if (data) {
+        setEnergy(data.level)
+        if (data.peak_time) setPeakTime(data.peak_time)
+      }
     })
   }, [])
 
@@ -134,6 +138,40 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   )}
                 >
                   {level}
+                </button>
+              ))}
+            </div>
+            {/* Peak Time */}
+            <div className="text-[11px] text-white/30 tracking-wider mt-3 mb-2">
+              高效时段
+            </div>
+            <div className="flex gap-1.5">
+              {([
+                { value: 'morning', label: '上午' },
+                { value: 'afternoon', label: '下午' },
+                { value: 'evening', label: '晚上' },
+              ] as const).map(item => (
+                <button
+                  key={item.value}
+                  onClick={async () => {
+                    const next = peakTime === item.value ? null : item.value
+                    setPeakTime(next)
+                    try {
+                      await fetch('/api/energy', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ peak_time: next }),
+                      })
+                    } catch {
+                      setPeakTime(peakTime)
+                    }
+                  }}
+                  className={cn(
+                    'flex-1 py-1.5 rounded-button border-[1.5px] border-white/15 text-[11px] text-white/30 cursor-pointer transition-all',
+                    peakTime === item.value && 'border-sage bg-sage/20 text-sage'
+                  )}
+                >
+                  {item.label}
                 </button>
               ))}
             </div>

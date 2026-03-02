@@ -35,7 +35,7 @@ function ContentPage() {
   // Modal state
   const [url, setUrl] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
-  const [preview, setPreview] = useState<{ title: string; summary: string; category: string } | null>(null)
+  const [preview, setPreview] = useState<{ title: string; summary: string; category: string; key_points?: string[] } | null>(null)
   const [myNote, setMyNote] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [saving, setSaving] = useState(false)
@@ -55,6 +55,13 @@ function ContentPage() {
   useEffect(() => {
     loadContents()
   }, [])
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('确定要删除这条收藏吗？')) return
+    const supabase = createClient()
+    await supabase.from('contents').delete().eq('id', id)
+    setContents(prev => prev.filter(c => c.id !== id))
+  }
 
   const filteredContents = contents.filter(c => {
     if (filter !== '全部' && c.category !== filter) return false
@@ -108,6 +115,7 @@ function ContentPage() {
         title: preview.title,
         summary: preview.summary,
         my_note: myNote,
+        key_points: preview.key_points || [],
         category: selectedCategory,
         source_type: sourceType,
       })
@@ -188,17 +196,25 @@ function ContentPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredContents.map(c => (
-            <ContentCard
-              key={c.id}
-              title={c.title || ''}
-              summary={c.summary || ''}
-              category={c.category || '其他'}
-              sourceType={(c.source_type as 'wechat' | 'youtube' | 'web') || 'web'}
-              sourceName=""
-              myNote={c.my_note || undefined}
-              date={formatDate(c.created_at)}
-              aiSummary={!!c.summary}
-            />
+            <div key={c.id} className="relative group">
+              <ContentCard
+                title={c.title || ''}
+                summary={c.summary || ''}
+                category={c.category || '其他'}
+                sourceType={(c.source_type as 'wechat' | 'youtube' | 'web') || 'web'}
+                sourceName=""
+                myNote={c.my_note || undefined}
+                keyPoints={c.key_points || []}
+                date={formatDate(c.created_at)}
+                aiSummary={!!c.summary}
+              />
+              <button
+                onClick={() => handleDelete(c.id)}
+                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-[11px] text-ink-muted hover:text-terracotta bg-white/80 backdrop-blur-sm px-2 py-1 rounded transition-all"
+              >
+                删除
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -254,6 +270,16 @@ function ContentPage() {
               <div className="bg-cream rounded-input p-4 mb-5">
                 <div className="text-sm font-medium text-ink mb-1.5">{preview.title || '（无标题）'}</div>
                 <div className="text-[13px] text-ink-light leading-relaxed">{preview.summary}</div>
+                {preview.key_points && preview.key_points.length > 0 && (
+                  <ul className="mt-2.5 space-y-1">
+                    {preview.key_points.map((point, i) => (
+                      <li key={i} className="text-[12px] text-ink-light leading-relaxed flex items-start gap-1.5">
+                        <span className="text-gold mt-0.5">•</span>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 <div className="flex items-center gap-2 mt-3">
                   <span className="text-[10px] text-ink-muted bg-cream border border-border px-1.5 py-0.5 rounded tracking-wider">AI摘要</span>
                 </div>

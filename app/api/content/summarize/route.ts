@@ -46,7 +46,8 @@ export async function POST(request: Request) {
       return NextResponse.json({
         title: title || '未知标题',
         summary: '请配置 ANTHROPIC_API_KEY 以启用AI摘要',
-        category: '其他'
+        category: '其他',
+        key_points: []
       })
     }
 

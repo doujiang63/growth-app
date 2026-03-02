@@ -18,6 +18,7 @@ interface ContentCardProps {
   sourceType: 'wechat' | 'youtube' | 'web'
   sourceName: string
   myNote?: string
+  keyPoints?: string[]
   date: string
   aiSummary?: boolean
   onClick?: () => void
@@ -30,6 +31,7 @@ export function ContentCard({
   sourceType,
   sourceName,
   myNote,
+  keyPoints,
   date,
   aiSummary,
   onClick,
@@ -68,6 +70,18 @@ export function ContentCard({
         <p className="text-[12px] text-ink-muted leading-relaxed mb-2.5 line-clamp-2">
           {summary}
         </p>
+
+        {/* Key Points */}
+        {keyPoints && keyPoints.length > 0 && (
+          <ul className="space-y-0.5 mb-2.5">
+            {keyPoints.map((point, i) => (
+              <li key={i} className="text-[11px] text-ink-light leading-relaxed flex items-start gap-1">
+                <span className="text-gold mt-px">•</span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* User note */}
         {myNote && (

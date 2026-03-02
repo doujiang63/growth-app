@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { MoodSelector } from '@/components/shared/mood-selector'
+import { HabitChecklist } from '@/components/shared/habit-checklist'
 import { useAutoSave } from '@/hooks/use-auto-save'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, Check, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Check, Loader2, AlertCircle, Trash2 } from 'lucide-react'
 import type { Diary } from '@/lib/types'
 import { WithShell } from '@/components/layout/with-shell'
 
@@ -199,6 +200,19 @@ export default function DiaryEditorPage() {
             )}
             <span className="ml-1">{wordCount} 字</span>
           </div>
+          {diaryId && (
+            <button
+              onClick={async () => {
+                if (!confirm('确定要删除这篇日记吗？')) return
+                const supabase = createClient()
+                await supabase.from('diaries').delete().eq('id', diaryId)
+                router.push('/diary')
+              }}
+              className="flex items-center gap-1 px-3 py-2 rounded-button text-[13px] text-ink-muted hover:text-terracotta hover:bg-terracotta/10 transition-all"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
           <button
             onClick={handleManualSave}
             disabled={manualSaving}
@@ -223,6 +237,14 @@ export default function DiaryEditorPage() {
           今天的心情
         </label>
         <MoodSelector value={form.mood} onChange={v => updateField('mood', v)} />
+      </div>
+
+      {/* Habit Checklist */}
+      <div className="mb-6">
+        <label className="block text-xs tracking-wider uppercase text-ink-muted mb-2">
+          今日习惯打卡
+        </label>
+        <HabitChecklist />
       </div>
 
       {/* Title */}

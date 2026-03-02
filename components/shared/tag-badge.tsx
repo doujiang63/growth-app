@@ -11,6 +11,15 @@ const TAG_COLOR_MAP: Record<string, string> = {
   '焦虑': 'text-terracotta bg-terracotta/[0.12]',
   '幸福': 'text-rose bg-rose/[0.12]',
   '开心': 'text-gold bg-gold/[0.12]',
+  // Inspiration types
+  '新词概念': 'text-lavender bg-lavender/[0.12]',
+  '新工具': 'text-sage bg-sage/[0.12]',
+  '创意想法': 'text-gold bg-gold/[0.12]',
+  '待深挖话题': 'text-terracotta bg-terracotta/[0.12]',
+  // Inspiration statuses
+  '待挖掘': 'text-gold bg-gold/[0.12]',
+  '已深入': 'text-sage bg-sage/[0.12]',
+  '已放弃': 'text-ink-muted bg-ink-muted/[0.12]',
 }
 
 interface TagBadgeProps {
