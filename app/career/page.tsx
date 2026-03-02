@@ -68,13 +68,18 @@ export default function CareerPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      await supabase.from('career').insert({
+      const { error } = await supabase.from('career').insert({
         user_id: user.id,
         type: formType,
         title: formTitle.trim(),
         content: formContent.trim(),
         progress: formProgress,
       })
+
+      if (error) {
+        console.error('Save career error:', error)
+        return
+      }
 
       setShowModal(false)
       setFormTitle('')

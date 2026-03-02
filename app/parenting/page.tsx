@@ -70,13 +70,18 @@ export default function ParentingPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      await supabase.from('parenting').insert({
+      const { error } = await supabase.from('parenting').insert({
         user_id: user.id,
         title: formTitle.trim(),
         content: formContent.trim(),
         milestone_age: formAge.trim(),
         tags: formTags,
       })
+
+      if (error) {
+        console.error('Save parenting error:', error)
+        return
+      }
 
       setShowModal(false)
       setFormTitle('')

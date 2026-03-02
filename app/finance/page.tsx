@@ -77,9 +77,17 @@ export default function FinancePage() {
       }
 
       if (editingGoal) {
-        await supabase.from('finance').update(payload).eq('id', editingGoal.id)
+        const { error } = await supabase.from('finance').update(payload).eq('id', editingGoal.id)
+        if (error) {
+          console.error('Update finance error:', error)
+          return
+        }
       } else {
-        await supabase.from('finance').insert(payload)
+        const { error } = await supabase.from('finance').insert(payload)
+        if (error) {
+          console.error('Save finance error:', error)
+          return
+        }
       }
 
       setShowModal(false)

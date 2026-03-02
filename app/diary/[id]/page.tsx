@@ -36,6 +36,7 @@ export default function DiaryEditorPage() {
     self_note: '',
   })
   const initializedRef = useRef(false)
+  const savingRef = useRef(false)
 
   useEffect(() => {
     if (isNew || initializedRef.current) return
@@ -63,32 +64,38 @@ export default function DiaryEditorPage() {
   }, [isNew, params.id])
 
   const saveFn = useCallback(async (data: DiaryFormData) => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (savingRef.current) return
+    savingRef.current = true
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    if (!diaryId) {
-      const { data: newDiary, error } = await supabase
-        .from('diaries')
-        .insert({
-          user_id: user.id,
-          ...data,
-          updated_at: new Date().toISOString(),
-        })
-        .select('id')
-        .single()
-      if (newDiary && !error) {
-        setDiaryId(newDiary.id)
-        window.history.replaceState(null, '', `/diary/${newDiary.id}`)
+      if (!diaryId) {
+        const { data: newDiary, error } = await supabase
+          .from('diaries')
+          .insert({
+            user_id: user.id,
+            ...data,
+            updated_at: new Date().toISOString(),
+          })
+          .select('id')
+          .single()
+        if (newDiary && !error) {
+          setDiaryId(newDiary.id)
+          window.history.replaceState(null, '', `/diary/${newDiary.id}`)
+        }
+      } else {
+        await supabase
+          .from('diaries')
+          .update({
+            ...data,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', diaryId)
       }
-    } else {
-      await supabase
-        .from('diaries')
-        .update({
-          ...data,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', diaryId)
+    } finally {
+      savingRef.current = false
     }
   }, [diaryId])
 

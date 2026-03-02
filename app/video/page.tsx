@@ -48,7 +48,7 @@ export default function VideoPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      await supabase.from('videos').insert({
+      const { error } = await supabase.from('videos').insert({
         user_id: user.id,
         title: douyinTitle || '抖音视频',
         douyin_url: douyinUrl.trim(),
@@ -57,6 +57,11 @@ export default function VideoPage() {
         tags: [],
         description: '',
       })
+
+      if (error) {
+        console.error('Save video error:', error)
+        return
+      }
 
       setShowDouyinDialog(false)
       setDouyinUrl('')
