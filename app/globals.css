@@ -1,0 +1,154 @@
+/* ============================================================
+   Growth App -- Global Styles
+   A warm, elegant design system for personal growth management
+   ============================================================ */
+
+/* --- Google Fonts ------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+/* --- Tailwind Directives ----------------------------------- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- CSS Custom Properties --------------------------------- */
+:root {
+  /* Background & Surface */
+  --cream: #F5F0E8;
+  --warm-white: #FDFAF5;
+
+  /* Text */
+  --ink: #1A1714;
+  --ink-light: #4A4540;
+  --ink-muted: #8A8480;
+
+  /* Accent – Nature */
+  --sage: #7A9E87;
+  --sage-light: #B8D4C0;
+
+  /* Accent – Warm */
+  --terracotta: #C4714A;
+  --terracotta-light: #E8C4B0;
+
+  /* Accent – Highlight */
+  --gold: #C9A84C;
+  --gold-light: #EDD98A;
+
+  /* Accent – Cool */
+  --lavender: #8B7BAB;
+  --lavender-light: #C8BFD8;
+
+  /* Accent – Misc */
+  --rose: #B5726A;
+
+  /* Borders & Shadows */
+  --border: rgba(26, 23, 20, 0.1);
+  --shadow: 0 2px 20px rgba(26, 23, 20, 0.08);
+  --shadow-lg: 0 8px 40px rgba(26, 23, 20, 0.12);
+}
+
+/* --- Base Styles ------------------------------------------- */
+@layer base {
+  body {
+    font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    background-color: var(--cream);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings default to Noto Serif SC for Chinese elegance */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Noto Serif SC', 'Songti SC', serif;
+  }
+
+  /* --- Scrollbar ------------------------------------------- */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-muted) var(--cream);
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--cream);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--ink-muted);
+    border-radius: 3px;
+  }
+
+  /* --- Selection ------------------------------------------- */
+  ::selection {
+    background-color: var(--gold-light);
+    color: var(--ink);
+  }
+
+  ::-moz-selection {
+    background-color: var(--gold-light);
+    color: var(--ink);
+  }
+}
+
+/* --- Focus Ring Utilities ---------------------------------- */
+@layer components {
+  .focus-ring {
+    @apply outline-none ring-2 ring-offset-2;
+    ring-color: var(--sage);
+    ring-offset-color: var(--cream);
+  }
+
+  .focus-ring-gold {
+    @apply outline-none ring-2 ring-offset-2;
+    ring-color: var(--gold);
+    ring-offset-color: var(--cream);
+  }
+
+  /* Apply focus-ring on keyboard focus only */
+  .focus-ring-auto:focus-visible {
+    @apply outline-none ring-2 ring-offset-2;
+    ring-color: var(--sage);
+    ring-offset-color: var(--cream);
+  }
+}
+
+/* --- Keyframe Animations ----------------------------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Animation Utility Classes ----------------------------- */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .animate-spin-slow {
+    animation: spin 1.2s linear infinite;
+  }
+}
