@@ -87,31 +87,38 @@ function ContentPage() {
   const handleSave = async () => {
     if (!preview) return
     setSaving(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setSaving(false); return }
 
-    let sourceType = 'web'
-    if (url.includes('weixin') || url.includes('mp.weixin') || url.includes('wechat')) sourceType = 'wechat'
-    else if (url.includes('youtube') || url.includes('youtu.be')) sourceType = 'youtube'
+      let sourceType = 'web'
+      if (url.includes('weixin') || url.includes('mp.weixin') || url.includes('wechat')) sourceType = 'wechat'
+      else if (url.includes('youtube') || url.includes('youtu.be')) sourceType = 'youtube'
 
-    await supabase.from('contents').insert({
-      user_id: user.id,
-      url: url.trim(),
-      title: preview.title,
-      summary: preview.summary,
-      my_note: myNote,
-      category: selectedCategory,
-      source_type: sourceType,
-    })
+      const { error } = await supabase.from('contents').insert({
+        user_id: user.id,
+        url: url.trim(),
+        title: preview.title,
+        summary: preview.summary,
+        my_note: myNote,
+        category: selectedCategory,
+        source_type: sourceType,
+      })
 
-    setShowModal(false)
-    setUrl('')
-    setPreview(null)
-    setMyNote('')
-    setSelectedCategory('')
-    setSaving(false)
-    loadContents()
+      if (error) { console.error('Save error:', error); setSaving(false); return }
+
+      setShowModal(false)
+      setUrl('')
+      setPreview(null)
+      setMyNote('')
+      setSelectedCategory('')
+      loadContents()
+    } catch (e) {
+      console.error('Save error:', e)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
