@@ -8,6 +8,7 @@ import { useAutoSave } from '@/hooks/use-auto-save'
 import { cn } from '@/lib/utils'
 import { ArrowLeft, Check, Loader2, AlertCircle } from 'lucide-react'
 import type { Diary } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 interface DiaryFormData {
   title: string
@@ -108,6 +109,7 @@ export default function DiaryEditorPage() {
   }
 
   return (
+    <WithShell>
     <div className="animate-fadeIn max-w-[800px]">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -217,5 +219,6 @@ export default function DiaryEditorPage() {
         </div>
       </div>
     </div>
+    </WithShell>
   )
 }

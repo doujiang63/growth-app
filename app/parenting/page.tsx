@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { TagBadge } from '@/components/shared/tag-badge'
 import { X } from 'lucide-react'
 import type { Parenting, Content } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 const MILESTONE_EMOJIS: Record<string, string> = {
   '语言': '🗣️',
@@ -95,6 +96,7 @@ export default function ParentingPage() {
   }
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       {/* Hero Banner */}
       <div className="bg-gradient-to-br from-rose/20 via-cream to-lavender/10 rounded-[16px] p-6 md:p-8 mb-8 relative overflow-hidden border border-rose/10">
@@ -331,5 +333,6 @@ export default function ParentingPage() {
         </div>
       )}
     </div>
+    </WithShell>
   )
 }

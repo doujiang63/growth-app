@@ -9,6 +9,7 @@ import { SectionHeader } from '@/components/shared/section-header'
 import { EmptyState } from '@/components/shared/empty-state'
 import { X } from 'lucide-react'
 import type { Finance } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 const PROGRESS_COLORS = ['sage', 'gold', 'terracotta', 'lavender', 'rose']
 
@@ -101,6 +102,7 @@ export default function FinancePage() {
   }
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       {/* Hero Banner */}
       <div className="bg-gradient-to-br from-gold/15 via-cream to-sage/10 rounded-[16px] p-6 md:p-8 mb-8 relative overflow-hidden border border-gold/10">
@@ -367,5 +369,6 @@ export default function FinancePage() {
         </div>
       )}
     </div>
+    </WithShell>
   )
 }

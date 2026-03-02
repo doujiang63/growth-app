@@ -7,6 +7,7 @@ import { formatFullDate } from '@/lib/utils'
 import { MOODS } from '@/lib/constants'
 import { TagBadge } from '@/components/shared/tag-badge'
 import type { Diary } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 export default function DiaryListPage() {
   const router = useRouter()
@@ -28,6 +29,7 @@ export default function DiaryListPage() {
   const getMoodEmoji = (mood: string) => MOODS.find(m => m.value === mood)?.emoji || '📝'
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       <div className="flex justify-between items-center mb-5">
         <h2 className="font-serif text-lg text-ink">日记列表</h2>
@@ -97,5 +99,6 @@ export default function DiaryListPage() {
         </div>
       )}
     </div>
+    </WithShell>
   )
 }

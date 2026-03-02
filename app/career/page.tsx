@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { TagBadge } from '@/components/shared/tag-badge'
 import { X } from 'lucide-react'
 import type { Career, Content } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 const TYPE_CONFIG: Record<string, { label: string; emoji: string; color: string }> = {
   goal: { label: '目标', emoji: '🎯', color: 'sage' },
@@ -91,6 +92,7 @@ export default function CareerPage() {
   const learningCount = items.filter(i => i.type === 'learning').length
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       {/* Hero Banner */}
       <div className="bg-gradient-to-br from-terracotta/15 via-cream to-gold/10 rounded-[16px] p-6 md:p-8 mb-8 relative overflow-hidden border border-terracotta/10">
@@ -352,5 +354,6 @@ export default function CareerPage() {
         </div>
       )}
     </div>
+    </WithShell>
   )
 }

@@ -9,12 +9,15 @@ import { cn } from '@/lib/utils'
 import { ContentCard } from '@/components/shared/content-card'
 import { Loader2, X, Search } from 'lucide-react'
 import type { Content } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 export default function ContentPageWrapper() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-ink-muted text-sm">加载中...</div>}>
-      <ContentPage />
-    </Suspense>
+    <WithShell>
+      <Suspense fallback={<div className="text-center py-20 text-ink-muted text-sm">加载中...</div>}>
+        <ContentPage />
+      </Suspense>
+    </WithShell>
   )
 }
 

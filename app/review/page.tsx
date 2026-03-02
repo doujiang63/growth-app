@@ -1,5 +1,7 @@
 'use client'
 
+import { WithShell } from '@/components/layout/with-shell'
+
 export default function ReviewPage() {
   const now = new Date()
   const weekNumber = Math.ceil(
@@ -7,6 +9,7 @@ export default function ReviewPage() {
   )
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       {/* Hero Banner */}
       <div className="bg-gradient-to-br from-lavender/15 via-cream to-sage/10 rounded-[16px] p-6 md:p-8 mb-8 relative overflow-hidden border border-lavender/10">
@@ -102,5 +105,6 @@ export default function ReviewPage() {
         </div>
       </div>
     </div>
+    </WithShell>
   )
 }

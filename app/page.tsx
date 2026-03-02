@@ -10,6 +10,7 @@ import { VideoCard } from '@/components/shared/video-card'
 import { ModuleCard } from '@/components/shared/module-card'
 import { MilestoneItem } from '@/components/shared/milestone-item'
 import { ProgressBar } from '@/components/shared/progress-bar'
+import { WithShell } from '@/components/layout/with-shell'
 import type { Content, Video, Parenting, Career, Finance } from '@/lib/types'
 
 export default function DashboardPage() {
@@ -37,6 +38,7 @@ export default function DashboardPage() {
   }, [])
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       {/* Today Strip */}
       <div className="bg-gradient-to-br from-ink to-[#2D2820] rounded-[16px] p-6 md:p-8 mb-8 relative overflow-hidden">
@@ -205,5 +207,6 @@ export default function DashboardPage() {
         </ModuleCard>
       </div>
     </div>
+    </WithShell>
   )
 }

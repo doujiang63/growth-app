@@ -8,6 +8,7 @@ import { VideoCard } from '@/components/shared/video-card'
 import { EmptyState } from '@/components/shared/empty-state'
 import { X } from 'lucide-react'
 import type { Video } from '@/lib/types'
+import { WithShell } from '@/components/layout/with-shell'
 
 const GRADIENTS = [
   'from-sage/30 to-lavender/30',
@@ -73,6 +74,7 @@ export default function VideoPage() {
   }
 
   return (
+    <WithShell>
     <div className="animate-fadeIn">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -295,5 +297,6 @@ export default function VideoPage() {
         </div>
       )}
     </div>
+    </WithShell>
   )
 }
