@@ -34,7 +34,7 @@ export interface Content {
   my_note: string
   key_points: string[]
   category: '职场' | '育儿' | '理财' | '个人成长' | '其他'
-  source_type: 'wechat' | 'youtube' | 'web'
+  source_type: 'wechat' | 'douyin' | 'youtube' | 'web'
   created_at: string
 }
 

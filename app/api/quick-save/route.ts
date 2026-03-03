@@ -15,9 +15,9 @@ function extractUrl(text: string): string | null {
   return match ? match[0].replace(/[，。！？、]+$/, '') : null
 }
 
-function detectUrlType(url: string): 'video' | 'wechat' | 'web' {
+function detectSourceType(url: string): string {
   const lower = url.toLowerCase()
-  if (lower.includes('douyin') || lower.includes('tiktok')) return 'video'
+  if (lower.includes('douyin') || lower.includes('tiktok')) return 'douyin'
   if (lower.includes('weixin') || lower.includes('mp.weixin')) return 'wechat'
   return 'web'
 }
@@ -46,29 +46,7 @@ export async function POST(request: Request) {
     const cleanUrl = extractUrl(url) || url.trim()
 
     const supabase = createAdminClient()
-    const urlType = type || detectUrlType(cleanUrl)
-
-    if (urlType === 'video') {
-      const { data, error } = await supabase.from('videos').insert({
-        user_id: userId,
-        title: title || '抖音视频',
-        douyin_url: cleanUrl,
-        video_url: '',
-        thumbnail_url: '',
-        tags: [],
-        description: '',
-      }).select('id').single()
-
-      if (error) {
-        console.error('Insert video error:', error)
-        return NextResponse.json({ error: 'Failed to save video' }, { status: 500 })
-      }
-
-      return NextResponse.json({ success: true, type: 'video', id: data.id })
-    }
-
-    // Content type (wechat or web)
-    const sourceType = urlType === 'wechat' ? 'wechat' : 'web'
+    const sourceType = type || detectSourceType(cleanUrl)
     let contentTitle = title || ''
     let summary = ''
     let category = '其他'

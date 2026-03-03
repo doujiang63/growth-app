@@ -31,6 +31,7 @@ export const ENERGY_LEVELS = [1, 2, 3, 4, 5] as const
 
 export const SOURCE_TYPES = [
   { value: 'wechat', name: '微信公众号', color: 'sage' },
+  { value: 'douyin', name: '抖音', color: 'rose' },
   { value: 'youtube', name: 'YouTube', color: 'terracotta' },
   { value: 'web', name: '网页', color: 'lavender' },
 ] as const
