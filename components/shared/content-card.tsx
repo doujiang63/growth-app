@@ -7,6 +7,7 @@ import { AiBadge } from './ai-badge'
 
 const ACCENT_GRADIENTS: Record<string, string> = {
   wechat: 'from-sage to-sage-light',
+  douyin: 'from-rose to-rose-light',
   youtube: 'from-terracotta to-terracotta-light',
   web: 'from-lavender to-lavender-light',
 }
@@ -15,7 +16,7 @@ interface ContentCardProps {
   title: string
   summary: string
   category: string
-  sourceType: 'wechat' | 'youtube' | 'web'
+  sourceType: 'wechat' | 'douyin' | 'youtube' | 'web'
   sourceName: string
   myNote?: string
   keyPoints?: string[]

@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils'
 
 interface SourceIconProps {
-  type: 'wechat' | 'youtube' | 'web'
+  type: 'wechat' | 'douyin' | 'youtube' | 'web'
 }
 
 const SOURCE_CONFIG: Record<SourceIconProps['type'], { label: string; bg: string; text: string }> = {
   wechat: { label: '微', bg: 'bg-sage', text: 'text-white' },
+  douyin: { label: '抖', bg: 'bg-rose', text: 'text-white' },
   youtube: { label: '\u25B6', bg: 'bg-terracotta', text: 'text-white' },
   web: { label: '\uD83D\uDD17', bg: 'bg-cream', text: 'text-ink-light' },
 }

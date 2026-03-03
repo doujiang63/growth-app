@@ -201,7 +201,7 @@ function ContentPage() {
                 title={c.title || ''}
                 summary={c.summary || ''}
                 category={c.category || '其他'}
-                sourceType={(c.source_type as 'wechat' | 'youtube' | 'web') || 'web'}
+                sourceType={(c.source_type as 'wechat' | 'douyin' | 'youtube' | 'web') || 'web'}
                 sourceName=""
                 myNote={c.my_note || undefined}
                 keyPoints={c.key_points || []}
