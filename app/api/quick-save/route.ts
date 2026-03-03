@@ -10,6 +10,11 @@ function createAdminClient() {
   )
 }
 
+function extractUrl(text: string): string | null {
+  const match = text.match(/https?:\/\/[^\s\u4e00-\u9fff]+/i)
+  return match ? match[0].replace(/[，。！？、]+$/, '') : null
+}
+
 function detectUrlType(url: string): 'video' | 'wechat' | 'web' {
   const lower = url.toLowerCase()
   if (lower.includes('douyin') || lower.includes('tiktok')) return 'video'
@@ -37,14 +42,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
+    // Extract URL from share text (e.g. Douyin copies "7.87 复制打开抖音... https://v.douyin.com/xxx/")
+    const cleanUrl = extractUrl(url) || url.trim()
+
     const supabase = createAdminClient()
-    const urlType = type || detectUrlType(url)
+    const urlType = type || detectUrlType(cleanUrl)
 
     if (urlType === 'video') {
       const { data, error } = await supabase.from('videos').insert({
         user_id: userId,
         title: title || '抖音视频',
-        douyin_url: url.trim(),
+        douyin_url: cleanUrl,
         video_url: '',
         thumbnail_url: '',
         tags: [],
@@ -72,7 +80,7 @@ export async function POST(request: Request) {
         // Fetch page content
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 8000)
-        const res = await fetch(url, {
+        const res = await fetch(cleanUrl, {
           signal: controller.signal,
           headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GrowthApp/1.0)' },
         })
@@ -110,7 +118,7 @@ export async function POST(request: Request) {
 
     if (!contentTitle) {
       try {
-        contentTitle = new URL(url).hostname
+        contentTitle = new URL(cleanUrl).hostname
       } catch {
         contentTitle = '未知来源'
       }
@@ -118,7 +126,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabase.from('contents').insert({
       user_id: userId,
-      url: url.trim(),
+      url: cleanUrl,
       title: contentTitle,
       summary,
       my_note: '',
