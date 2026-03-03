@@ -122,6 +122,16 @@ export interface HabitLog {
   created_at: string
 }
 
+export interface Task {
+  id: string
+  user_id: string
+  title: string
+  description: string
+  remind_at: string | null
+  status: 'pending' | 'done'
+  created_at: string
+}
+
 export interface Database {
   diaries: Diary
   videos: Video
@@ -134,4 +144,5 @@ export interface Database {
   inspirations: Inspiration
   habits: Habit
   habit_logs: HabitLog
+  tasks: Task
 }

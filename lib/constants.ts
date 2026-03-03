@@ -21,6 +21,7 @@ export const NAV_ITEMS = [
   { label: '视频日记', emoji: '🎬', href: '/video', section: '日常' },
   { label: '内容收藏', emoji: '📚', href: '/content', section: '日常' },
   { label: '灵感捕捉', emoji: '💡', href: '/inspiration', section: '日常' },
+  { label: '任务提醒', emoji: '⏰', href: '/tasks', section: '日常' },
   { label: '育儿', emoji: '👶', href: '/parenting', section: '成长板块' },
   { label: '职场', emoji: '💼', href: '/career', section: '成长板块' },
   { label: '理财', emoji: '💰', href: '/finance', section: '成长板块' },
